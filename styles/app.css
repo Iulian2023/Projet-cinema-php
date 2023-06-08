@@ -2,6 +2,30 @@
     font-family: 'Poppins', sans-serif;
 }
 
-nav a{
+:root{
+    --dark-color : #00000026;
+}
+
+/*#################################################*/
+/* Classes réutilisables */
+.my-shadow{
+    box-shadow: 0 -0.5rem 1rem var(--dark-color);
+}
+
+.fs-7{
+    font-size: 1.15rem;
+}
+
+/*#################################################*/
+
+html, body{
+    height: 100%;
+}
+
+body{
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+}
+nav a, footer p{
     font-family: 'Pacifico', cursive;
 }
