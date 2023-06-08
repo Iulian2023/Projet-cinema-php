@@ -1,30 +1,41 @@
-<?php 
+<?php
+
+    // var_dump($_SERVER);
+    // die()
 
     // Si les données arrive au serveur via la méthode "POST", 
-
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        
         //  Un peut de cyber sécurité
         // Protection contre les failles de type XSS pour éviter les injection de scripts malveillants
+        $post_clean = [];
+
+        foreach ($_POST as $key => $value) {
+            $post_clean[$key] = htmlspecialchars(trim(addslashes($value))); 
+        }
+
 
         // Protection contre les failles de type CSRF
-
+        
         // Protection contre les spams
-
+        
         // Validation des données
-
-        // Si il y a des erreurs,
-
-            // Sauvegarder les anciennes données envoyées en sesion,
-            // Sauvegarder les messages d'erreurs en sesion,
-            // Redirection vers la page laquelle proviennent les information,
-            // Arrêt de l'execution du script.
+        
+        // S'il y a des erreurs,
+        
+        // Sauvegarder les anciennes données envoyées en sesion,
+        // Sauvegarder les messages d'erreurs en sesion,
+        // Redirection vers la page laquelle proviennent les information,
+        // Arrêt de l'execution du script.
         
         // Dans le cas contraitre,
         // Etablir une connexion avec la basse des données
-
+        
         //Effectuer une requête d'insertion des données dans la table "films",
         // Efferctuer une redirection ver la page d'accueil
-
+        
         // Arrêter l'exécution du script
+    }
 
 ?>
 
@@ -41,11 +52,11 @@
                     <form method="post">
                         <div class="mb-3">
                             <label for="name">Le Nom du film <span class="text-danger">*</span></label>
-                            <input type="text" name="name" id="name" class="form-control" autofocus required>
+                            <input type="text" name="name" id="name" class="form-control" autofocus >
                         </div>
                         <div class="mb-3">
                             <label for="actors">Le Nom du/des acteur(s) <span class="text-danger">*</span></label>
-                            <input type="text" name="actors" id="actors" class="form-control" required>
+                            <input type="text" name="actors" id="actors" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label for="review">La note / 5</label>
