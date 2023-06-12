@@ -29,6 +29,8 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins&display=swap" rel="stylesheet">
 
-        
+        <!-- font awesome -->
+        <?= isset($font_awesome) ? $font_awesome : ""; ?>
+
     </head>
     <body class="bg-light">
