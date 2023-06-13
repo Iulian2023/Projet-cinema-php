@@ -1,5 +1,36 @@
 <?php
     session_start();
+
+    /* Si l'identifinat du film à modifier n'existe pas dans*/
+
+        if( !isset($_GET['film_id']) || empty($_GET['film_id'])) {
+            //On redirige l'utilisateur vers la page d'accueil
+            //  On arrête l'exécution du script 
+            return header("Location: index.php");
+        }
+
+
+
+    /* Dans le cas contraire, */
+
+    /* Récuperer l'identifiant du film, */
+    // Tout en protegant le sytéme contre les failles de type XSS
+    $film_id = (int) htmlentities((trim($_GET['film_id'])));
+    var_dump($film_id);
+    die();
+
+    /* Etablir un connexion avec la base des données */
+
+    require __DIR__ . "/db/connexion.php";
+    /* Effectuer une requête pour vérifier que l'identifiant appartient à celui d'un film de la table "film"*/
+
+    /* Si ce n'est pas le cas 
+        * On redirige l'utilisateur vers la page d'accueil
+        * On arrête l'exécution du script*/
+
+    // DAns le cas contaire
+    // Récupérons les informations du film à modifer
+
     // Si les données arrive au serveur via la méthode "POST", 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -65,17 +96,31 @@
         }
 
 
-        if (isset($post_clean['review'])) {
-            if ($post_clean['review'] !== "") {
-                if ( !is_numeric($post_clean['review'])) {
-                    $errors['review'] = "Veuillez entrer un nombre";
+        // if (isset($post_clean['review'])) {
+        //     if ( ($post_clean['review']) !== "") {
+        //         if ( ! is_numeric($post_clean['review'])) {
+        //             $errors['review'] = "Veuillez entrer un nombre";
+        //         }
+        //         elseif (($post_clean['review'] < '0') || ($post_clean['review'] > '5')) {
+        //             $errors["review"] = "La note doit être comprise entre 0 et 5.";
+        //         }
+        //     }
+        // }
+
+        if ( isset($post_clean['review']) ) 
+        {
+            if ( $post_clean['review'] !== "" )
+            {
+                if ( ! is_numeric($post_clean['review']) ) 
+                {
+                    $errors['review'] = "Veuillez entrer un nombre.";
                 }
-                elseif (($post_clean['review'] < '0') || ($post_clean['review'] > '5')) {
-                    $errors["review"] = "La note doit être comprise entre 0 et 5.";
+                elseif ( ($post_clean['review'] < '0') || ($post_clean['review'] > '5') )
+                {
+                    $errors['review'] = "La note doit être comprise entre 0 et 5.";
                 }
             }
         }
-
 
         if (isset($post_clean['comment'])){
             if ( $post_clean['comment'] !== "" ) {
@@ -133,7 +178,7 @@
 
 <!-- Chargement du contenu spécific à la page -->
 <main class="container">
-        <h1 class="text-center my-3 display-5">Nouveau film</h1>
+        <h1 class="text-center my-3 display-5">Modifier ce film</h1>
 
         <div class="container">
             <div class="row">
