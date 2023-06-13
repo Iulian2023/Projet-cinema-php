@@ -29,3 +29,26 @@ body{
 nav a, footer p{
     font-family: 'Pacifico', cursive;
 }
+
+.card{
+    border-radius: 35px;
+    width: 100%;
+    transition: 1s;
+}
+
+.card:hover{
+    transform: scale(1.05);
+    transition: 1s;
+}
+
+@media screen and (min-width: 768px) {
+    .card{
+        width: 60%;
+    }
+}
+
+@media screen and (min-width: 1024px) {
+    .card{
+        width: 40%;
+    }
+}

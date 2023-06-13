@@ -118,7 +118,7 @@
         $req->closeCursor();
 
         /* Générons un message flesh de succés */
-        $_SESSION["success"] = "<em>$post_clean[name]<em> a été ajoute à la liste avec succès";
+        $_SESSION["success"] = "<em>" . stripslashes($post_clean['name']) . "<em> a été ajoute à la liste avec succès";
 
         //Efferctuer une redirection ver la page d'accueil
         // Arrêter l'exécution du script
@@ -158,7 +158,7 @@
                             class="form-control" 
                             autofocus 
                             maxlength="255" 
-                            value="<?= $_SESSION['old']['name'] ?? ''; unset($_SESSION['old']['name']);?>">
+                            value="<?= isset($_SESSION['old']['name']) && !empty($_SESSION['old']['name']) ? stripslashes($_SESSION['old']['name']) : ""; unset($_SESSION['old']['name']);?>">
                         </div>
                         <div class="mb-3">
                             <label for="actors">Le Nom du/des acteur(s) <span class="text-danger">*</span></label>
@@ -168,7 +168,7 @@
                             id="actors" 
                             class="form-control" 
                             maxlength="255"
-                            value="<?= $_SESSION['old']['actors'] ?? ''; unset($_SESSION['old']['actors']);?>">
+                            value="<?= isset($_SESSION['old']['actors']) && !empty($_SESSION['old']['actors']) ? stripslashes($_SESSION['old']['actors']) : ""; unset($_SESSION['old']['actors']);?>">
                         </div>
                         <div class="mb-3">
                             <label for="review">La note / 5</label>
@@ -180,7 +180,7 @@
                             max="5" 
                             min="0" 
                             class="form-control"
-                            value="<?= $_SESSION['old']['review'] ?? ''; unset($_SESSION['old']['review']);?>" >
+                            value="<?= isset($_SESSION['old']['review']) && !empty($_SESSION['old']['review']) ? stripslashes($_SESSION['old']['review']) : ""; unset($_SESSION['old']['review']);?>" >
                         </div>
                         <div class="mb-3">
                             <label for="comment">Un commentaire ?</label>
@@ -188,7 +188,7 @@
                             name="comment" 
                             id="comment" 
                             class="form-control" 
-                            rows="4"><?= $_SESSION['old']['comment'] ?? ''; unset($_SESSION['old']['comment']);?></textarea>
+                            rows="4"><?= isset($_SESSION['old']['comment']) && !empty($_SESSION['old']['comment']) ? stripslashes($_SESSION['old']['comment']) : ""; unset($_SESSION['old']['comment']);?></textarea>
                         </div>
                         <div class="mb-3">
                             <input 

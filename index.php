@@ -46,17 +46,17 @@ HTML;
             <?php if($films) : ?>
                 <div class="container d-flex flex-column justify-content-center align-items-center">
                     <?php foreach($films as $film): ?>
-                        <div class="card text-start my-3 shadow">
+                        <div class="card card-test text-start my-3 shadow">
                           <div class="card-body">
                             <p class="card-title">
-                                <strong>Nom du Film : </strong><?= $film['name'] ?>
+                                <strong>Nom du Film : </strong><?= htmlspecialchars(stripslashes($film['name']))  ?>
                             </p>
                             <p class="card-text">
-                               <strong>Actor(s) : </strong> <?= $film['actors'] ?>
+                               <strong>Actor(s) : </strong> <?= htmlspecialchars(stripslashes($film['actors'])) ?>
                             </p>
                             <hr>
                             <a title="Vois détails du film" 
-                            href="" class="mx-3 text-info" data-bs-toggle="modal" data-bs-target="#modal<?= $film['id'] ?>"><i class="fa-solid fa-eye"></i></a>
+                            href="" class="mx-3 text-info" data-bs-toggle="modal" data-bs-target="#modal<?= htmlspecialchars($film['id']) ?>"><i class="fa-solid fa-eye"></i></a>
 
                             <!-- Modal -->
                             <div class="modal fade" 
@@ -65,12 +65,12 @@ HTML;
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                     <div class="modal-header">
-                                        <h1 class="modal-title fs-5" id="exampleModalLabel"><?= $film['name'] ?></h1>
+                                        <h1 class="modal-title fs-5" id="exampleModalLabel"><?= htmlspecialchars($film['name']) ?></h1>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
                                         <p><strong> Note du film : </strong> <?= (isset($film["review"]) && !empty($film['review'])) ? $film["review"] : 'Non renseignée'; ?></p>
-                                        <p>Commentaire du film : <?= isset($film["comment"]) ? $film["comment"] : 'Non renseignée'; ?></p>
+                                        <p>Commentaire du film : <?= isset($film["comment"]) && !empty($film['comment']) ? $film["comment"] : 'Non renseignée'; ?></p>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-info" data-bs-dismiss="modal">Fermer</button>
@@ -78,8 +78,8 @@ HTML;
                                     </div>
                                 </div>
                             </div>
-                            <a title="Modifier ce film" href="edit.php?film_id=<?=$film['id']; ?>" class="mx-3 text-secondary"><i class="fa-solid fa-pen-to-square"></i></a>
-                            <a title="Supprimer ce film" href="" class="mx-3 text-danger"><i class="fa-solid fa-trash-can"></i></a>
+                            <a title="Modifier ce film" href="edit.php?film_id=<?=htmlspecialchars($film['id']); ?>" class="mx-3 text-secondary"><i class="fa-solid fa-pen-to-square"></i></a>
+                            <a onclick=" return confirm('Confirmer la suppresion ?')" title="Supprimer ce film" href="delete.php?film_id=<?=htmlspecialchars($film['id']); ?>" class="mx-3 text-danger"><i class="fa-solid fa-trash-can"></i></a>
                           </div>
                         </div>
                     <?php endforeach ?>

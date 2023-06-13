@@ -16,20 +16,31 @@
     /* Récuperer l'identifiant du film, */
     // Tout en protegant le sytéme contre les failles de type XSS
     $film_id = (int) htmlentities((trim($_GET['film_id'])));
-    var_dump($film_id);
-    die();
 
     /* Etablir un connexion avec la base des données */
-
     require __DIR__ . "/db/connexion.php";
+
     /* Effectuer une requête pour vérifier que l'identifiant appartient à celui d'un film de la table "film"*/
+    $req = $db->prepare("SELECT * FROM film WHERE id=:id LIMIT 1");
+    $req->bindValue(":id", $film_id);
+    $req->execute();
+        
+    // Compter les nombres des enregistrement récupéré de la table film
+    $row = $req->rowCount();
 
-    /* Si ce n'est pas le cas 
-        * On redirige l'utilisateur vers la page d'accueil
-        * On arrête l'exécution du script*/
-
-    // DAns le cas contaire
+    // Si ce n'est pas le cas égal à 1
+    if ($row != 1) {
+        // On redirige l'utilisateur vers la page d'accueil
+        // On arrête l'exécution du script//
+        return header("Location: index.php");
+    }
+        
+    // Dans le cas contaire
     // Récupérons les informations du film à modifer
+    $film = $req->fetch();
+        
+
+
 
     // Si les données arrive au serveur via la méthode "POST", 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -96,31 +107,18 @@
         }
 
 
-        // if (isset($post_clean['review'])) {
-        //     if ( ($post_clean['review']) !== "") {
-        //         if ( ! is_numeric($post_clean['review'])) {
-        //             $errors['review'] = "Veuillez entrer un nombre";
-        //         }
-        //         elseif (($post_clean['review'] < '0') || ($post_clean['review'] > '5')) {
-        //             $errors["review"] = "La note doit être comprise entre 0 et 5.";
-        //         }
-        //     }
-        // }
-
-        if ( isset($post_clean['review']) ) 
-        {
-            if ( $post_clean['review'] !== "" )
-            {
-                if ( ! is_numeric($post_clean['review']) ) 
-                {
-                    $errors['review'] = "Veuillez entrer un nombre.";
+        if (isset($post_clean['review'])) {
+            if ( ($post_clean['review']) !== "") {
+                if ( ! is_numeric($post_clean['review'])) {
+                    $errors['review'] = "Veuillez entrer un nombre";
                 }
-                elseif ( ($post_clean['review'] < '0') || ($post_clean['review'] > '5') )
-                {
-                    $errors['review'] = "La note doit être comprise entre 0 et 5.";
+                elseif (($post_clean['review'] < '0') || ($post_clean['review'] > '5')) {
+                    $errors["review"] = "La note doit être comprise entre 0 et 5.";
                 }
             }
         }
+
+
 
         if (isset($post_clean['comment'])){
             if ( $post_clean['comment'] !== "" ) {
@@ -142,20 +140,22 @@
             return header(("Location: $_SERVER[HTTP_REFERER]"));
         }
         
-        // Dans le cas contraitre,
         if (isset($post_clean['review']) && !empty($post_clean['review'])) {
-           $review_rounded = round($post_clean['review'], 1);
+            
+            // L'arrondoir à une chiffre apreès la virgules
+            $review_rounded = round($post_clean['review'], 1);
         }
         // Etablir une connexion avec la basse des données
         require __DIR__ . "/db/connexion.php";
 
         //Effectuer une requête d'insertion des données dans la table "film",
-        $req = $db->prepare("INSERT INTO film (name, actors, review, comment, created_at, updated_at) VALUES (:name, :actors, :review, :comment, now(), now() ) ");
+        $req = $db->prepare("UPDATE film SET name=:name, actors=:actors, review=:review, comment=:comment, updated_at=now() WHERE id=:id");
 
-        $req -> bindValue(":name",    $post_clean['name']);
-        $req -> bindValue(":actors",  $post_clean['actors']);
-        $req -> bindValue(":review",  isset($review_rounded) ? $review_rounded : "" );
-        $req -> bindValue(":comment", $post_clean['comment']);
+        $req -> bindValue(":name",      $post_clean['name']);
+        $req -> bindValue(":actors",    $post_clean['actors']);
+        $req -> bindValue(":review",    isset($review_rounded) ? $review_rounded : "" );
+        $req -> bindValue(":comment",   $post_clean['comment']);
+        $req -> bindValue(":id",        $film['id']);
 
         $req->execute();
 
@@ -163,7 +163,7 @@
         $req->closeCursor();
 
         /* Générons un message flesh de succés */
-        $_SESSION["success"] = "<em>$post_clean[name]<em> a été ajoute à la liste avec succès";
+        $_SESSION['success'] = "<em>" . stripslashes($post_clean['name']) ."</em> a été modifié avec succès";
 
         //Efferctuer une redirection ver la page d'accueil
         // Arrêter l'exécution du script
@@ -203,7 +203,7 @@
                             class="form-control" 
                             autofocus 
                             maxlength="255" 
-                            value="<?= $_SESSION['old']['name'] ?? ''; unset($_SESSION['old']['name']);?>">
+                            value="<?= isset($_SESSION['old']['name']) && !empty($_SESSION['old']['name']) ? stripslashes($_SESSION['old']['name']) : htmlspecialchars(stripslashes($film['name'])) ; unset($_SESSION['old']['name']);?>">
                         </div>
                         <div class="mb-3">
                             <label for="actors">Le Nom du/des acteur(s) <span class="text-danger">*</span></label>
@@ -213,7 +213,7 @@
                             id="actors" 
                             class="form-control" 
                             maxlength="255"
-                            value="<?= $_SESSION['old']['actors'] ?? ''; unset($_SESSION['old']['actors']);?>">
+                            value="<?= isset($_SESSION['old']['actors']) && !empty($_SESSION['old']['actors']) ? stripslashes($_SESSION['old']['actors']) : htmlspecialchars(stripslashes($film['actors'])); unset($_SESSION['old']['actors']);?>">
                         </div>
                         <div class="mb-3">
                             <label for="review">La note / 5</label>
@@ -225,7 +225,7 @@
                             max="5" 
                             min="0" 
                             class="form-control"
-                            value="<?= $_SESSION['old']['review'] ?? ''; unset($_SESSION['old']['review']);?>" >
+                            value="<?= isset($_SESSION['old']['review']) && !empty($_SESSION['old']['review']) ? stripslashes($_SESSION['old']['review']) : htmlspecialchars(stripslashes($film['review'])); unset($_SESSION['old']['review']);?>" >
                         </div>
                         <div class="mb-3">
                             <label for="comment">Un commentaire ?</label>
@@ -233,7 +233,7 @@
                             name="comment" 
                             id="comment" 
                             class="form-control" 
-                            rows="4"><?= $_SESSION['old']['comment'] ?? ''; unset($_SESSION['old']['comment']);?></textarea>
+                            rows="4"><?= isset($_SESSION['old']['comment']) && !empty($_SESSION['old']['comment']) ? stripslashes($_SESSION['old']['comment']) : htmlspecialchars(stripslashes($film['comment'])); unset($_SESSION['old']['comment']);?></textarea>
                         </div>
                         <div class="mb-3">
                             <input 
@@ -251,8 +251,8 @@
                             <input 
                             formnovalidate 
                             type="submit" 
-                            class="btn btn-primary shadow" 
-                            value="Envoyer">
+                            class="btn btn-secondary shadow" 
+                            value="Modifier">
                         </div>
                     </form>
                 </div>
